@@ -10,7 +10,7 @@
 
 	<!-- References -->
 	<ItemGroup>
-		
+	  <None Remove="Systems\en-US.hjson" />
 	</ItemGroup>
 
 </Project>
