@@ -8,7 +8,6 @@ namespace KitchenSinkRevengeance.Projectiles
 {
     public class TrashProjectile : ModProjectile
     {
-
         int bounces = 1;
 
         public override void SetDefaults()
