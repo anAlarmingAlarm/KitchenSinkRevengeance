@@ -1,20 +1,3 @@
 Items: {
-	TrashCannon: {
-		DisplayName: Trash Cannon
-		Tooltip: "'It's called a trash can, not a trash can't'"
-	}
-
-	UnluckyHorseshoe: {
-		DisplayName: Unlucky Horseshoe
-		Tooltip: "'Wearing this is probably a bad idea'"
-	}
-
-	MagicBomb: {
-		DisplayName: Magic Bomb
-		Tooltip: ""
-	}
-}
-
-Projectiles: {
-	TrashProjectile.DisplayName: Trash Ball
+	
 }

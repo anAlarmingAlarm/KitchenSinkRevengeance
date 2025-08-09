@@ -12,5 +12,10 @@
 	<ItemGroup>
 	  <None Remove="Systems\en-US.hjson" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Items\Accessories\" />
+	  <Folder Include="Items\Weapons\Ranged\" />
+	  <Folder Include="Projectiles\" />
+	</ItemGroup>
 
 </Project>
