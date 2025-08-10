@@ -15,7 +15,6 @@
 	<ItemGroup>
 	  <Folder Include="Items\Accessories\" />
 	  <Folder Include="Items\Weapons\Ranged\" />
-	  <Folder Include="Projectiles\" />
 	</ItemGroup>
 
 </Project>

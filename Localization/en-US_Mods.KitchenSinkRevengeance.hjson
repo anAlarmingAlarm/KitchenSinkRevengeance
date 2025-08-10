@@ -1,3 +1,16 @@
 Items: {
-	
+	Frostweave: {
+		DisplayName: Frostweave
+		Tooltip:
+			'''
+			Creates a slow-moving snowstorm 
+			Snowstorm fires hail at nearby enemies
+			The tome is surprisingly short
+			'''
+	}
+}
+
+Projectiles: {
+	FrostweaveProjectile.DisplayName: Frostweave Projectile
+	FrostweaveHailProjectile.DisplayName: Frostweave Hail Projectile
 }
