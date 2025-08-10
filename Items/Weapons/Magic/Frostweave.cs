@@ -14,10 +14,10 @@ public class Frostweave : ModItem
         Item.width = 32;
         Item.height = 40;
         
-        Item.damage = 15;
-        Item.knockBack = 2;
+        Item.damage = 12;
+        Item.knockBack = 1;
         
-        Item.DefaultToStaff(ModContent.ProjectileType<FrostweaveProjectile>(), 2.25f, 80, 10);
+        Item.DefaultToStaff(ModContent.ProjectileType<FrostweaveProjectile>(), 2.5f, 80, 10);
         Item.autoReuse = true;
         Item.UseSound = SoundID.Item165;
         Item.useStyle = ItemUseStyleID.Shoot;
@@ -27,8 +27,7 @@ public class Frostweave : ModItem
     {
         Vector2 direction = Vector2.Normalize(Main.MouseWorld - player.Center) * 2f;
         Projectile.NewProjectile(source, player.Center, direction, type, 
-            damage, knockback, player.whoAmI, 60*5);
-        NetMessage.SendData(MessageID.PlayerControls, number: player.whoAmI);
+            damage, knockback, player.whoAmI, 60*4);
 
         return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
