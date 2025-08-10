@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,7 +12,9 @@ public class FrostweaveProjectile : ModProjectile
     private float maxDetectionRadius = 500f;
     private NPC TargetNPC = null;
     private float childProjectileSpeed = 15f;
-    private float shootSpeed = 50;
+    private float shootSpeed = 40;
+    private int particleCount = 8;
+    private float particleSpeed = 3f;
     
     public override void SetDefaults()
     {
@@ -19,6 +22,7 @@ public class FrostweaveProjectile : ModProjectile
         Projectile.height = 64;
 
         Projectile.aiStyle = -1;
+        Projectile.alpha = 100;
     }
 
     public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
@@ -42,6 +46,31 @@ public class FrostweaveProjectile : ModProjectile
             // Spawn projectile, only from the owner
             if (Projectile.owner == Main.myPlayer) SpawnHail();
         }
+
+        for (int i = 0; i < particleCount; i++)
+        {
+            SpawnDust();
+        }
+    }
+
+    private void SpawnDust()
+    {
+        // How far ahead of the projectile's center to aim
+        float predictionFactor = 16f;
+        float radius = Main.rand.NextFloat(8, 48);
+        float angle = Main.rand.NextFloat(MathHelper.TwoPi);
+        
+        Vector2 offset = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+        Vector2 spawnPos = Projectile.Center + offset;
+        Vector2 predictedTarget = Projectile.Center + (Projectile.velocity * predictionFactor);
+
+        Vector2 toTarget = predictedTarget - spawnPos;
+        toTarget.Normalize();
+
+        // Create dust
+        Dust dust = Dust.NewDustPerfect(spawnPos, DustID.Ice, toTarget * particleSpeed);
+        dust.noGravity = true;
+        dust.alpha = 125;
     }
 
     public override bool? CanHitNPC(NPC target)
