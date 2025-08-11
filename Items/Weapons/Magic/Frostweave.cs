@@ -32,4 +32,14 @@ public class Frostweave : ModItem
 
         return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe()
+            .AddIngredient(ItemID.IceBlock, 20)
+            .AddIngredient(ItemID.Silk, 5)
+            .AddIngredient(ItemID.FallenStar)
+            .AddTile(TileID.WorkBenches)
+            .Register();
+    }
 }
