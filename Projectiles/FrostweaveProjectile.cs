@@ -9,7 +9,7 @@ namespace KitchenSinkRevengeance.Projectiles;
 public class FrostweaveProjectile : ModProjectile
 {
     private float time = 0;
-    private float maxDetectionRadius = 500f;
+    private int maxDetectionRadius = 32 * 16; // 16 units per tile
     private NPC TargetNPC = null;
     private float childProjectileSpeed = 15f;
     private float shootSpeed = 40;
@@ -78,51 +78,19 @@ public class FrostweaveProjectile : ModProjectile
         return false;
     }
 
+    public override bool CanHitPlayer(Player target)
+    {
+        return false;
+    }
+
     private void SpawnHail()
     {
-        
-        if (TargetNPC == null) {
-            TargetNPC = FindClosestNPC(maxDetectionRadius);
-        }
-
-        if (TargetNPC != null && !IsValidTarget(TargetNPC))
-        {
-            TargetNPC = null;
-        }
-
+        TargetNPC = SinkUtils.GetNearestTargetInLoS(TargetNPC, Projectile.Center, Projectile.position, Projectile.width, maxDetectionRadius);
         if (TargetNPC == null) return;
-        Vector2 direction = Vector2.Normalize(TargetNPC.Center - Projectile.Center);
-        Vector2 velocity = direction * childProjectileSpeed;
+       
+        Vector2 velocity = Vector2.Normalize(TargetNPC.Center - Projectile.Center) * childProjectileSpeed;
         Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, 
             ModContent.ProjectileType<FrostweaveHailProjectile>(), Projectile.damage, Projectile.knockBack, 
             Projectile.owner);
-    }
-    
-    private NPC FindClosestNPC(float maxDetectDistance) {
-        NPC closestNPC = null;
-
-        // Using squared values in distance checks will let us skip square root calculations, drastically improving this method's speed.
-        float sqrMaxDetectDistance = maxDetectDistance * maxDetectDistance;
-
-        // Loop through all NPCs
-        foreach (var target in Main.ActiveNPCs) {
-            // Check if NPC able to be targeted. 
-            if (IsValidTarget(target)) {
-                // The DistanceSquared function returns a squared distance between 2 points, skipping relatively expensive square root calculations
-                float sqrDistanceToTarget = Vector2.DistanceSquared(target.Center, Projectile.Center);
-
-                // Check if it is within the radius
-                if (sqrDistanceToTarget < sqrMaxDetectDistance) {
-                    sqrMaxDetectDistance = sqrDistanceToTarget;
-                    closestNPC = target;
-                }
-            }
-        }
-
-        return closestNPC;
-    }
-    
-    public bool IsValidTarget(NPC target) {
-        return target.CanBeChasedBy() && Collision.CanHit(Projectile.Center, 1, 1, target.position, target.width, target.height);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 
 namespace KitchenSinkRevengeance
@@ -9,72 +10,128 @@ namespace KitchenSinkRevengeance
     public class SinkUtils
     {
         /// <summary>
-        /// Get the nearest player to a point<br />
-        /// If <c>alive</c> is true, limits search to living players
+        /// Utility function for projectile enemy targeting<br />
+        /// Checks if target is valid and in range (if specified)<br />
+        /// If not, finds nearest valid target in range<br />
+        /// May return null if no valid targets are found<br /><br />
+        /// Note that this will continue to target the same NPC until it either dies or exits its range, even if another NPC comes closer<br />
+        /// To always get the nearest target, use <c>GetNearestTargetActive()</c>
         /// </summary>
-        public static Player GetNearestPlayer(Vector2 point, bool alive = false)
+        public static NPC GetNearestTarget(NPC oldTarget, Vector2 point, int maxDetectionRadius = int.MaxValue)
         {
-            Player player = null;
-            float len = 0;
-            foreach (Player newPlayer in Main.ActivePlayers)
-            {
-                if (alive && newPlayer.dead) continue;
+            maxDetectionRadius *= maxDetectionRadius; // square up
 
-                float newLen = newPlayer.DistanceSQ(point);
-                if (newLen > len)
+            if (oldTarget != null && oldTarget.CanBeChasedBy() && oldTarget.Center.DistanceSQ(point) <= maxDetectionRadius)
+            {
+                return oldTarget;
+            }
+
+            NPC target = null;
+            float len = maxDetectionRadius; // surely this doesn't horrifically backfire somehow
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.CanBeChasedBy())
                 {
-                    player = newPlayer;
-                    len = newLen;
+                    float newLen = npc.DistanceSQ(point);
+                    if (newLen < len)
+                    {
+                        target = npc;
+                        len = newLen;
+                    }
                 }
             }
-            return player;
+            return target;
         }
 
         /// <summary>
-        /// Get the nearest player to a point from an array of players<br />
-        /// If <c>alive</c> is true, limits search to living players
+        /// Utility function for projectile enemy targeting<br />
+        /// Returns nearest valid target in range<br />
+        /// May return null if no valid targets are found<br /><br />
+        /// Note that this will check for a new target every time it's called<br />
+        /// To only get a new target when the current one is invalid, use <c>GetNearestTarget()</c>
         /// </summary>
-        public static Player GetNearestPlayer(Vector2 point, Player[] players, bool alive = false)
+        public static NPC GetNearestTargetActive(Vector2 point, int maxDetectionRadius = int.MaxValue)
         {
-            Player player = null;
-            float len = 0;
-            for (int i = 0; i < players.Length; i++)
-            {
-                if (!player.active || (alive && player.dead)) continue;
+            maxDetectionRadius *= maxDetectionRadius;
 
-                float newLen = players[i].DistanceSQ(point);
-                if (newLen > len)
+            NPC target = null;
+            float len = maxDetectionRadius;
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.CanBeChasedBy())
                 {
-                    player = players[i];
-                    len = newLen;
+                    float newLen = npc.DistanceSQ(point);
+                    if (newLen < len)
+                    {
+                        target = npc;
+                        len = newLen;
+                    }
                 }
             }
-            return player;
+            return target;
         }
 
         /// <summary>
-        /// Get the nearest living enemy to a point<br />
-        /// If <c>valid</c> is true, limits search to enemies that can be targetted<br />
-        /// If <c>valid</c> is false, search can find any enemy even if they can't be hurt<br />
-        /// If <c>index</c> > -1 and <c>valid</c> is true, will check for immune frames from the player corresponding to that index
+        /// Utility function for projectile enemy targeting<br />
+        /// Checks if target is valid, in range (if specified), and with an unobstructed line of sight<br />
+        /// If not, finds nearest valid target in range with an unobstructed line of sight<br />
+        /// May return null if no valid targets are found<br /><br />
+        /// Note that this will continue to target the same NPC until it either dies or exits its range, even if another NPC comes closer<br />
+        /// To always get the nearest target, use <c>GetNearestTargetActiveInLoS()</c>
         /// </summary>
-        public static NPC GetNearestEnemy(Vector2 point, bool valid = false, int index = -1)
+        public static NPC GetNearestTargetInLoS(NPC oldTarget, Vector2 center, Vector2 position, int projectileWidth, int maxDetectionRadius = int.MaxValue)
         {
-            NPC npc = null;
-            float len = 0;
-            foreach (NPC newNpc in Main.ActiveNPCs)
-            {
-                if (npc.friendly || npc.CountsAsACritter || npc.life <= 0) continue;
-                if (valid && (npc.dontTakeDamage || npc.immortal || (index >= 0 && npc.immune[index] > 0))) continue;
+            maxDetectionRadius *= maxDetectionRadius;
 
-                float newLen = newNpc.DistanceSQ(point);
-                if (newLen > len)
+            if (oldTarget != null && oldTarget.CanBeChasedBy() && oldTarget.Center.DistanceSQ(center) <= maxDetectionRadius
+                && Collision.CanHit(position, projectileWidth, projectileWidth, oldTarget.position, oldTarget.width, oldTarget.height))
+            {
+                return oldTarget;
+            }
+
+            NPC target = null;
+            float len = maxDetectionRadius;
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.CanBeChasedBy() && Collision.CanHit(position, projectileWidth, projectileWidth, npc.position, npc.width, npc.height))
                 {
-                    npc = newNpc;
-                    len = newLen;
+                    float newLen = npc.DistanceSQ(center);
+                    if (newLen < len)
+                    {
+                        target = npc;
+                        len = newLen;
+                    }
                 }
             }
-            return npc;
+            return target;
+        }
+
+        /// <summary>
+        /// Utility function for projectile enemy targeting<br />
+        /// Returns nearest valid target in range with an unobstructed line of sight<br />
+        /// May return null if no valid targets are found<br /><br />
+        /// Note that this will check for a new target every time it's called<br />
+        /// To only get a new target when the current one is invalid, use <c>GetNearestTargetInLoS()</c>
+        /// </summary>
+        public static NPC GetNearestTargetInLoSActive(Vector2 center, Vector2 position, int projectileWidth, int maxDetectionRadius = int.MaxValue)
+        {
+            maxDetectionRadius *= maxDetectionRadius;
+
+            NPC target = null;
+            float len = maxDetectionRadius;
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.CanBeChasedBy() && Collision.CanHit(position, projectileWidth, projectileWidth, npc.position, npc.width, npc.height))
+                {
+                    float newLen = npc.DistanceSQ(center);
+                    if (newLen < len)
+                    {
+                        target = npc;
+                        len = newLen;
+                    }
+                }
+            }
+            return target;
         }
     }
 }

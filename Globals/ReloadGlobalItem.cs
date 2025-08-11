@@ -14,7 +14,7 @@ namespace KitchenSinkRevengeance.Globals
         public static readonly Dictionary<int, ReloadProperties> reloadProperties = new()
         {
             {ItemID.FlintlockPistol, new ReloadProperties()},
-            {ItemID.Musket, new ReloadProperties(reloadTime: 120, reloadStyle: ReloadStyle.Hoist)},
+            {ItemID.Musket, new ReloadProperties(reloadTime: 180, reloadStyle: ReloadStyle.Hoist)},
             {ItemID.TheUndertaker, new ReloadProperties(capacity: 6, reloadEffect: ReloadEffect.Heal, effectPotency: [5, 5])},
             {ItemID.Boomstick, new ReloadProperties(capacity: 4, reloadEffect: ReloadEffect.MoreDakka, effectPotency: [2, 1, 4])},
             {ItemID.Handgun, new ReloadProperties(capacity: 12, reloadStyle: ReloadStyle.Mag)},
@@ -304,7 +304,7 @@ namespace KitchenSinkRevengeance.Globals
         public readonly List<float> effectPotency;
 
         /// <summary> Specify unique properties for this weapon's reload </summary>
-        public ReloadProperties(bool disableReload = false, int reloadTime = 60, int capacity = 1, int consumption = 1, ReloadStyle reloadStyle = ReloadStyle.Default, int[] reloadDust = null, ReloadEffect reloadEffect = ReloadEffect.None, float[] effectPotency = null)
+        public ReloadProperties(bool disableReload = false, int reloadTime = 120, int capacity = 1, int consumption = 1, ReloadStyle reloadStyle = ReloadStyle.Default, int[] reloadDust = null, ReloadEffect reloadEffect = ReloadEffect.None, float[] effectPotency = null)
         {
             this.disableReload = disableReload;
             this.reloadTime = reloadTime;
