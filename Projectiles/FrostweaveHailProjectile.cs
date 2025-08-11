@@ -10,8 +10,6 @@ public class FrostweaveHailProjectile : ModProjectile
     private int particleCount = 4;
     public override void SetDefaults()
     {
-        Projectile.aiStyle = -1;
-
         Projectile.width = 16;
         Projectile.height = 16;
         Projectile.alpha = 255;
