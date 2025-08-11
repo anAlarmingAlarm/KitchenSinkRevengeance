@@ -19,18 +19,9 @@ public class Frostweave : ModItem
         
         Item.DefaultToStaff(ModContent.ProjectileType<FrostweaveProjectile>(), 2.5f, 80, 10);
         Item.autoReuse = true;
-        Item.UseSound = SoundID.Item165;
+        Item.UseSound = SoundID.Item8;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.rare = ItemRarityID.Blue;
-    }
-    
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-    {
-        Vector2 direction = Vector2.Normalize(Main.MouseWorld - player.Center) * 2f;
-        Projectile.NewProjectile(source, player.Center, direction, type, 
-            damage, knockback, player.whoAmI, 60*4);
-
-        return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
 
     public override void AddRecipes()

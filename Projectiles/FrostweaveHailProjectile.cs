@@ -10,8 +10,7 @@ public class FrostweaveHailProjectile : ModProjectile
     private int particleCount = 4;
     public override void SetDefaults()
     {
-        Projectile.aiStyle = ProjAIStyleID.Arrow;
-        AIType = ProjectileID.AmberBolt;
+        Projectile.aiStyle = -1;
 
         Projectile.width = 16;
         Projectile.height = 16;
@@ -23,8 +22,6 @@ public class FrostweaveHailProjectile : ModProjectile
 
     public override void AI()
     {
-        base.AI();
-        
         Vector2 dustOrigin = Projectile.Center - new Vector2(1, 1);
         for (int i = 0; i < particleCount; i++)
         {

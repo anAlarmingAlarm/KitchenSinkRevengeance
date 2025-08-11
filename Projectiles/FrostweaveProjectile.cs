@@ -8,7 +8,7 @@ namespace KitchenSinkRevengeance.Projectiles;
 
 public class FrostweaveProjectile : ModProjectile
 {
-    private float time = 0;
+    private int time = 0;
     private int maxDetectionRadius = 32 * 16; // 16 units per tile
     private NPC TargetNPC = null;
     private float childProjectileSpeed = 15f;
@@ -23,6 +23,7 @@ public class FrostweaveProjectile : ModProjectile
 
         Projectile.aiStyle = -1;
         Projectile.alpha = 100;
+        Projectile.timeLeft = 60 * 4;
     }
 
     public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
@@ -34,13 +35,6 @@ public class FrostweaveProjectile : ModProjectile
     public override void AI()
     {
         time++;
-
-        // If the projectile is as old as the max animation time, kill the projectile.
-        if (time >= Projectile.ai[0]) {
-            Projectile.Kill();
-            time = 0;
-        }
-
         if (time % shootSpeed == 0)
         {
             // Spawn projectile, only from the owner
