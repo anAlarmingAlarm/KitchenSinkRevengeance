@@ -16,14 +16,19 @@ public class FrostweaveProjectile : ModProjectile
     private int particleCount = 8;
     private float particleSpeed = 3f;
     
+    // Used for fade out animation near the end
+    private readonly int fadeOutDuration = 60 * 1;
+    private readonly int lifetime = 60 * 5;
+    private readonly int startAlpha = 100;
+    
     public override void SetDefaults()
     {
         Projectile.width = 64;
         Projectile.height = 64;
 
         Projectile.aiStyle = -1;
-        Projectile.alpha = 100;
-        Projectile.timeLeft = 60 * 4;
+        Projectile.alpha = startAlpha;
+        Projectile.timeLeft = lifetime;
     }
 
     public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
@@ -35,7 +40,8 @@ public class FrostweaveProjectile : ModProjectile
     public override void AI()
     {
         time++;
-        if (time % shootSpeed == 0)
+        // Shoot periodically, and if the projectile is not in the fade out animation
+        if (time % shootSpeed == 0 && time < lifetime - fadeOutDuration)
         {
             // Spawn projectile, only from the owner
             if (Projectile.owner == Main.myPlayer) SpawnHail();
@@ -45,12 +51,20 @@ public class FrostweaveProjectile : ModProjectile
         {
             SpawnDust();
         }
+
+        // Fade out animation
+        if (Projectile.timeLeft < fadeOutDuration)
+        {
+            // Projectile should start to fade out
+            // Scaled so the projectile smoothly fades out to 255 over the fadeOutDuration
+            Projectile.alpha += (255 - startAlpha) / fadeOutDuration;
+        }
     }
 
     private void SpawnDust()
     {
         // How far ahead of the projectile's center to aim
-        float predictionFactor = 16f;
+        float predictionFactor = 18f;
         float radius = Main.rand.NextFloat(8, 48);
         float angle = Main.rand.NextFloat(MathHelper.TwoPi);
         
@@ -61,10 +75,10 @@ public class FrostweaveProjectile : ModProjectile
         Vector2 toTarget = predictedTarget - spawnPos;
         toTarget.Normalize();
 
-        // Create dust
+        // Create dust with the parent's alpha
         Dust dust = Dust.NewDustPerfect(spawnPos, DustID.Ice, toTarget * particleSpeed);
         dust.noGravity = true;
-        dust.alpha = 125;
+        dust.alpha = Projectile.alpha;
     }
 
     public override bool? CanHitNPC(NPC target)
